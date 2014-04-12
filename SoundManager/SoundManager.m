@@ -117,16 +117,28 @@ NSString *const SoundDidFinishPlayingNotification = @"SoundDidFinishPlayingNotif
         _URL = URL;
         _baseVolume = 1.0f;
         
+        NSError *error;
+        
+        
+        NSData* data = [NSData dataWithContentsOfURL:URL] ;
+        
+        
 #if SM_USE_AV_AUDIO_PLAYER
-        _sound = [[AVAudioPlayer alloc] initWithContentsOfURL:URL error:NULL];
+        _sound = [[AVAudioPlayer alloc] initWithData:data error:&error];
 #else
         _sound = [[NSSound alloc] initWithContentsOfURL:URL byReference:YES];
 #endif
+        if (error)
+        {
+            NSLog(@"Error in audioPlayer: %@",
+                  [error localizedDescription]);
+        }
+        
+        
         self.volume = 1.0f;
     }
     return self;
 }
-
 - (void)prepareToPlay
 {
     //avoid overhead from repeated calls
